@@ -178,6 +178,7 @@ OFFICIAL_MODEL_NAMES = [
     "01-ai/Yi-34B",
     "01-ai/Yi-6B-Chat",
     "01-ai/Yi-34B-Chat",
+    "llava-hf/llava-1.5-7b-hf",
 ]
 """Official model names for models on HuggingFace."""
 
@@ -660,6 +661,11 @@ def convert_hf_model_config(model_name: str, **kwargs):
         architecture = "GemmaForCausalLM"
     else:
         hf_config = AutoConfig.from_pretrained(official_model_name, **kwargs)
+
+        # In case of multimodal model, load the text branch
+        if "text_config" in hf_config.__dict__:
+            hf_config = hf_config.text_config
+
         architecture = hf_config.architectures[0]
     if official_model_name.startswith(
         ("llama-7b", "meta-llama/Llama-2-7b")
